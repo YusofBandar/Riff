@@ -1,5 +1,5 @@
 # Riff
-Superfast and minimal dependecy pixel image comparasion tool built with rust. 
+Superfast and minimal dependency pixel image comparasion tool built with rust. 
 
 ```
 riff <base_path> <diff_path> <output_path>

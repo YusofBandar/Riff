@@ -1,21 +1,42 @@
 use image::Rgba;
+use structopt::StructOpt;
 use riff::colour_delta::{calculate_pixel_colour_delta, blend, rgb2y, rgba_to_f64};
 
+#[derive(Debug, StructOpt)]
+struct Opt {
+    /// Path to image (jpeg or png) to compare from
+    base_path: String,
+
+    /// Path to image (jpeg or png) to compare to
+    diff_path: String,
+
+    /// Path to output image (jpeg or png)
+    output_path: String,
+
+    /// Matching threshold, smaller values makes pixel comparison more sensitive
+    #[structopt(long = "threshold", default_value="0.1")]
+    threshold: f64,
+
+    /// Blending value of unchaged pixels, 0 alpha disables drawing of base image
+    #[structopt(long = "alpha", default_value="0")]
+    alpha: f64
+}
+
 fn main() {
-    let base = String::from("./images/tiger.jpeg");
-    let diff = String::from("./images/tiger-2.jpeg");
+    let opt = Opt::from_args();
+
+    let base = String::from(opt.base_path);
+    let diff = String::from(opt.diff_path);
 
     let base_img = read_image_from_file(&base);
     let diff_img = read_image_from_file(&diff);
 
     // golden-rod!!
     let diff_colour = [218 as u8, 165 as u8, 32 as u8, 255 as u8];
-    let threshold = 0.1;
-    let alpha = 0.0;
     let view_port = [0, 0, 1000, 419];
 
-    let img = compare(&base_img, &diff_img, threshold, alpha, diff_colour, view_port);
-    img.save("diff.png").unwrap();
+    let img = compare(&base_img, &diff_img, opt.threshold, opt.alpha, diff_colour, view_port);
+    img.save(opt.output_path).unwrap();
 }
 
 fn read_image_from_file(path: &String) -> image::DynamicImage {

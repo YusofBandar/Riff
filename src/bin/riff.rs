@@ -52,17 +52,30 @@ fn main() {
     let base_img = read_image_from_file(&base);
     let diff_img = read_image_from_file(&diff);
 
+    let options = CompareOptions{
+        threshold: opt.threshold,
+        alpha: opt.alpha,
+        diff_colour: opt.diff_colour,
+        view_port: opt.view_port
+    };
 
-    let img = compare(&base_img, &diff_img, opt.threshold, opt.alpha, opt.diff_colour, opt.view_port);
+    let img = compare(&base_img, &diff_img, options);
     img.save(opt.output_path).unwrap();
-
 }
 
 fn read_image_from_file(path: &String) -> image::DynamicImage {
     image::open(path).unwrap()
 }
 
-fn compare (base: &image::DynamicImage, diff: &image::DynamicImage, threshold: f64, alpha: f64, diff_colour: [u32; 4], view_port: Option<[u32; 4]>) -> image::RgbaImage {
+struct CompareOptions {
+    threshold: f64,
+    alpha: f64,
+    diff_colour: [u32; 4],
+    view_port: Option<[u32; 4]>
+}
+
+fn compare (base: &image::DynamicImage, diff: &image::DynamicImage, options: CompareOptions) -> image::RgbaImage {
+    let CompareOptions { threshold, alpha, diff_colour, view_port } = options;
     let base = base.to_rgba8();
     let diff = diff.to_rgba8();
 
@@ -75,7 +88,6 @@ fn compare (base: &image::DynamicImage, diff: &image::DynamicImage, threshold: f
     
     let view_port = [view_port[0], view_port[1], view_port[2] - 1, view_port[3] - 1];
     let max_delta = (35215 as f64) * threshold * threshold;
-
 
     let mut diff_image: image::RgbaImage = image::ImageBuffer::new(width, height);
 

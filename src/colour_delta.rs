@@ -61,3 +61,43 @@ pub fn calculate_pixel_colour_delta<T: Primitive>(pixel_a: &Rgba<T>, pixel_b: &R
 
     0.5053 * y * y + 0.299 * i * i + 0.1957 * q * q
 }
+
+#[cfg(test)]
+mod tests {
+    use image::Rgba;
+    use super::{calculate_pixel_colour_delta, blend, blend_semi_transparent_colour, rgb2i, rgb2q, rgb2y};
+
+     #[test]
+    fn blends() {
+        assert_eq!(blend(&200.0, &1.0), 200.0);
+    }
+
+     #[test]
+    fn blend_semi_transparent() {
+        assert_eq!(blend_semi_transparent_colour(&200.0, &0.0, &0.0, &255.0), [200.0, 0.0, 0.0, 255.0]);
+    }
+
+     #[test]
+    fn rgb_to_i() {
+        assert_eq!(rgb2i(&255.0, &100.0, &50.0), 108.46668295);
+    }
+
+     #[test]
+    fn rgb_to_q() {
+        assert_eq!(rgb2q(&255.0, &100.0, &50.0), 17.220529350000007);
+    }
+
+     #[test]
+    fn rgb_to_y() {
+        assert_eq!(rgb2y(&255.0, &100.0, &50.0), 140.60466255);
+    }
+
+    #[test]
+    fn calculates_colour_delta() {
+        let pixel_a = Rgba([255, 0, 0, 255]);
+        let pixel_b = Rgba([0, 255, 0, 255]);
+
+        assert_eq!(calculate_pixel_colour_delta(&pixel_a, &pixel_b), 24298.8755187344);
+        assert_eq!(calculate_pixel_colour_delta(&pixel_a, &pixel_a), 0.0);
+    }
+}

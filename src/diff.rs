@@ -30,11 +30,12 @@ pub fn compare (base: &image::DynamicImage, diff: &image::DynamicImage, options:
         }
 
         if is_within_viewport(x, y, view_port) {
+
             let diff_pixel = diff.get_pixel(x, y);
 
             // if pixels are the same don't bother to calculate delta
             if base_pixel[0] != diff_pixel[0] || base_pixel[1] != diff_pixel[1] || base_pixel[2] != diff_pixel[2] || base_pixel[3] != diff_pixel[3] {
-                let delta = calculate_pixel_colour_delta(base_pixel, diff_pixel);
+                let delta = calculate_pixel_colour_delta(&[base_pixel[0], base_pixel[1], base_pixel[2], base_pixel[3]], &[diff_pixel[0], diff_pixel[1], diff_pixel[2], diff_pixel[3]]);
                 if delta > max_delta {
                     diff_image.put_pixel(x, y, Rgba([diff_colour[0] as u8, diff_colour[1] as u8, diff_colour[2] as u8, diff_colour[3] as u8]));
                 }
@@ -47,8 +48,6 @@ pub fn compare (base: &image::DynamicImage, diff: &image::DynamicImage, options:
             }
         }
     }
-
-    println!("{:?}", base.into_vec());
 
     diff_image
 }

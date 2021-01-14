@@ -1,4 +1,20 @@
-use image::{Rgba, Primitive};
+use num_traits::{Bounded, Num, NumCast};
+
+/// Primitive trait from old stdlib
+pub trait Primitive: Copy + NumCast + Num + PartialOrd<Self> + Clone + Bounded {}
+
+impl Primitive for usize {}
+impl Primitive for u8 {}
+impl Primitive for u16 {}
+impl Primitive for u32 {}
+impl Primitive for u64 {}
+impl Primitive for isize {}
+impl Primitive for i8 {}
+impl Primitive for i16 {}
+impl Primitive for i32 {}
+impl Primitive for i64 {}
+impl Primitive for f32 {}
+impl Primitive for f64 {}
 
 pub fn blend(colour: &f64, alpha: &f64) -> f64 {
     (255 as f64) + (colour - (255 as f64)) * alpha
@@ -48,7 +64,7 @@ pub fn rgba_to_f64<T: Primitive>(r: &T, g: &T, b: &T, a: &T) -> [f64; 4] {
     [r_64, g_64, b_64, a_64]
 }
 
-pub fn calculate_pixel_colour_delta<T: Primitive>(pixel_a: &Rgba<T>, pixel_b: &Rgba<T>) -> f64 {
+pub fn calculate_pixel_colour_delta<T: Primitive>(pixel_a: &[T; 4], pixel_b: &[T; 4]) -> f64 {
     let pixel_a_64 = rgba_to_f64(&pixel_a[0], &pixel_a[1], &pixel_a[2], &pixel_a[3]);
     let pixel_b_64 = rgba_to_f64(&pixel_b[0], &pixel_b[1], &pixel_b[2], &pixel_b[3]);
 
@@ -64,7 +80,6 @@ pub fn calculate_pixel_colour_delta<T: Primitive>(pixel_a: &Rgba<T>, pixel_b: &R
 
 #[cfg(test)]
 mod tests {
-    use image::Rgba;
     use super::{calculate_pixel_colour_delta, blend, blend_semi_transparent_colour, rgb2i, rgb2q, rgb2y};
 
      #[test]
@@ -94,8 +109,8 @@ mod tests {
 
     #[test]
     fn calculates_colour_delta() {
-        let pixel_a = Rgba([255, 0, 0, 255]);
-        let pixel_b = Rgba([0, 255, 0, 255]);
+        let pixel_a = [255, 0, 0, 255];
+        let pixel_b = [0, 255, 0, 255];
 
         assert_eq!(calculate_pixel_colour_delta(&pixel_a, &pixel_b), 24298.8755187344);
         assert_eq!(calculate_pixel_colour_delta(&pixel_a, &pixel_a), 0.0);

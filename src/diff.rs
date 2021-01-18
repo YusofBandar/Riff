@@ -3,7 +3,7 @@ use super::colour_delta::{calculate_pixel_colour_delta, blend, rgb2y, rgba_to_f6
 
 pub struct CompareOptions {
     pub threshold: f64,
-    pub alpha: f64,
+    pub alpha: Option<f64>,
     pub diff_colour: [u32; 4],
     pub view_port: Option<[u32; 4]>
 }
@@ -39,7 +39,7 @@ pub fn compare (base: &image::DynamicImage, diff: &image::DynamicImage, options:
                 if delta > max_delta {
                     diff_image.put_pixel(x, y, Rgba([diff_colour[0] as u8, diff_colour[1] as u8, diff_colour[2] as u8, diff_colour[3] as u8]));
                 }
-            } else if alpha > 0.0  {
+            } else if let Some(alpha) = alpha  {
                 // draw unchaged pixels with specified alpha
                 let pixel = rgba_to_f64(&base_pixel[0], &base_pixel[1], &base_pixel[2], &base_pixel[3]);
                 let colour = rgb2y(&pixel[0], &pixel[1], &pixel[2]);
@@ -71,7 +71,7 @@ mod tests {
     fn compares() {
         let options = CompareOptions {
             threshold: 0.1,
-            alpha: 0.0,
+            alpha: Some(0.0),
             diff_colour: [255, 0, 0, 0],
             view_port: None
         };
@@ -90,7 +90,7 @@ mod tests {
     fn compares_with_viewport() {
         let options = CompareOptions {
             threshold: 0.1,
-            alpha: 0.0,
+            alpha: Some(0.0),
             diff_colour: [255, 0, 0, 0],
             view_port: Some([1, 0, 2, 1])
         };

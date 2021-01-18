@@ -10,22 +10,23 @@ struct Opt {
     diff_path: String,
 
     /// Path to output image (jpeg or png)
+    #[structopt(long = "output", short = "o", default_value = "./output.png")]
     output_path: String,
 
     /// The color of differing pixels in [R, G, B, A] format
-    #[structopt(long="diffColour", default_value="[218, 165, 32, 255]", parse(try_from_str = "parse_num_array"))]
+    #[structopt(long = "diffColour", short = "c", default_value = "[218, 165, 32, 255]", parse(try_from_str="parse_num_array"))]
     diff_colour: [u32; 4],
 
     /// Matching threshold, smaller values makes pixel comparison more sensitive
-    #[structopt(long = "threshold", default_value="0.1")]
+    #[structopt(long = "threshold", short = "t", default_value = "0.1")]
     threshold: f64,
 
-    /// Blending value of unchaged pixels, 0 alpha disables drawing of base image
-    #[structopt(long = "alpha", default_value="0")]
-    alpha: f64,
+    /// Blending value of unchaged pixels
+    #[structopt(long = "alpha", short = "a")]
+    alpha: Option<f64>,
 
     /// The region within base image to compare to in [x, y, width, height] format. Useful when comparing differently sized images
-    #[structopt(long="viewPort", parse(try_from_str = "parse_num_array"))]
+    #[structopt(long="view", parse(try_from_str = "parse_num_array"))]
     view_port: Option<[u32; 4]>
 }
 
@@ -51,7 +52,7 @@ fn main() {
     let base_img = read_image_from_file(&base);
     let diff_img = read_image_from_file(&diff);
 
-    let options = CompareOptions{
+    let options = CompareOptions {
         threshold: opt.threshold,
         alpha: opt.alpha,
         diff_colour: opt.diff_colour,

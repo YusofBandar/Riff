@@ -36,7 +36,7 @@ fn parse_num_array(array: &str) -> Result<[u32; 4], &'static str> {
 
     let mut num_array: [u32; 4] = [255; 4];
     for (i, el) in array.enumerate() {
-        num_array[i] = el.trim().parse::<u32>().unwrap();
+        num_array[i] = el.trim().parse::<u32>().expect("Argument incorrectly formatted, correct format should be: [a, b, c]");
     }
 
     Ok(num_array)
@@ -59,9 +59,14 @@ fn main() {
     };
 
     let img = compare(&base_img, &diff_img, options);
-    img.save(opt.output_path).unwrap();
+    match img.save(opt.output_path.clone()) { 
+        Ok(_) => (),
+        Err(_) => panic!("Could not save output file at {}", opt.output_path)}
 }
 
 fn read_image_from_file(path: &String) -> image::DynamicImage {
-    image::open(path).unwrap()
+    match image::open(path) {
+        Ok(img) => img,
+        Err(_) => panic!("Could not read file at {}", path)
+    }
 }
